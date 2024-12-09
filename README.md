@@ -318,7 +318,7 @@ Docker Images Used
 A docker-compose.yml file is included in the repository. Use the following command to start the containers:
 
 ```bash
-docker-compose up --build
+docker-compose -f /path/to/docker-compose.yml --env-file /path/to/.env up --build
 ```
 This will:
 
