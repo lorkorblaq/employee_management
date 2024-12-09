@@ -228,13 +228,13 @@ PORT=3000
 NODE_ENV=development
 
 #### Database
-DB_HOST=db
-DB_PORT=5432
-DB_USER=postgres
-DB_PASSWORD=yourpassword
-DB_NAME=yourdatabase
-ADMIN_EMAIL=yourLoginEmailAddress
-ADMIN_PASSWORD=yourLoginPassowrd
+- DB_HOST=db
+- DB_PORT=5432
+- DB_USER=postgres
+- DB_PASSWORD=yourpassword
+- DB_NAME=yourdatabase
+- ADMIN_EMAIL=yourLoginEmailAddress
+- ADMIN_PASSWORD=yourLoginPassowrd
 
 The ADMIN_EMAIL is automatically created as an admin and the ADMIN_PASSWORD is the login passoword 
 
