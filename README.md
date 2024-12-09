@@ -223,18 +223,22 @@ cd <project-folder>
 ```
 ### **2. Environment Configuration
 Set up the environment variables by creating a .env file in the root of your project. Below is an example of the variables to include:
-# Application
+#### Application
 PORT=3000
 NODE_ENV=development
 
-# Database
+#### Database
 DB_HOST=db
 DB_PORT=5432
 DB_USER=postgres
 DB_PASSWORD=yourpassword
 DB_NAME=yourdatabase
+ADMIN_EMAIL=yourLoginEmailAddress
+ADMIN_PASSWORD=yourLoginPassowrd
 
-# JWT
+The ADMIN_EMAIL is automatically created as an admin and the ADMIN_PASSWORD is the login passoword 
+
+#### JWT
 JWT_SECRET=your_jwt_secret
 
 ### **3. Using Docker Containers
