@@ -285,7 +285,14 @@ cd <project-folder>
 ### **2. Environment Configuration
 Set up the environment variables by creating a .env file in the root of your project. Below is an example of the variables to include:
 #### Application
-- PORT=3000
+- PORT
+- JWT_SECRET
+- RANDOM_STRING
+- PGHOST
+- PGUSER
+- PGPASSWORD
+- PGDATABASE
+- PGPORT
 
 #### Database
 - DB_HOST=db
