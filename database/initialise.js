@@ -36,15 +36,6 @@ const rl = readline.createInterface({
   output: process.stdout
 });
 
-// Helper function to ask a question and return the result as a promise
-const askQuestion = (question) => {
-  return new Promise((resolve) => {
-    rl.question(question, (answer) => {
-      resolve(answer);
-    });
-  });
-};
-
 export const initializeTables = async () => {
   console.log("Initializing tables...");
 
@@ -116,10 +107,8 @@ export const initializeTables = async () => {
     const adminExistsResult = await client.query(checkAdminUserQuery);
 
     if (adminExistsResult.rows.length === 0) {
-      // Ask for the admin user details
-      const email = await askQuestion("Enter the email for the first admin user: ");
-      const password = await askQuestion("Enter the password for the first admin user: ");
-
+      const email = process.env.ADMIN_EMAIL;
+      const password = process.env.ADMIN_PASSWORD;
       // Define the first admin user
       const firstAdminUser = {
         email: email,

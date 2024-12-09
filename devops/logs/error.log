@@ -1,0 +1,2 @@
+2024/12/05 20:17:25 [emerg] 1#1: host not found in upstream "backend:3000" in /etc/nginx/nginx.conf:5
+2024/12/05 20:21:39 [emerg] 1#1: host not found in upstream "backend:3000" in /etc/nginx/nginx.conf:5

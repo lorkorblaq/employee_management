@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  app:
+    image: lorkorblaq/kenkeputa:latest
+    ports:
+      - "${PORT}:${PORT}" # Maps the PORT variable
+    environment:
+      - JWT_SECRET=${JWT_SECRET}
+      - PGHOST=db               # Change from 127.0.0.1 to db
+      - PGUSER=${PGUSER}
+      - PGPASSWORD=${PGPASSWORD}
+      - PGDATABASE=${PGDATABASE}
+      - PGPORT=${PGPORT}
+      - ADMIN_EMAIL=${ADMIN_EMAIL}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD}
+    depends_on:
+      - db
+    volumes:
+      - .:/usr/src/app
+    restart: on-failure
+
+  db:
+    image: postgres:15-bullseye
+    environment:
+      - POSTGRES_USER=${PGUSER}
+      - POSTGRES_PASSWORD=${PGPASSWORD}
+      - POSTGRES_DB=${PGDATABASE}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: on-failure
+
+volumes:
+  postgres_data:   # Define the volume here
