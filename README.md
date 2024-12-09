@@ -224,8 +224,7 @@ cd <project-folder>
 ### **2. Environment Configuration
 Set up the environment variables by creating a .env file in the root of your project. Below is an example of the variables to include:
 #### Application
-PORT=3000
-NODE_ENV=development
+- PORT=3000
 
 #### Database
 - DB_HOST=db
@@ -233,18 +232,20 @@ NODE_ENV=development
 - DB_USER=postgres
 - DB_PASSWORD=yourpassword
 - DB_NAME=yourdatabase
+  
+#### Admin Login
 - ADMIN_EMAIL=yourLoginEmailAddress
 - ADMIN_PASSWORD=yourLoginPassowrd
 
 The ADMIN_EMAIL is automatically created as an admin and the ADMIN_PASSWORD is the login passoword 
 
 #### JWT
-JWT_SECRET=your_jwt_secret
+- JWT_SECRET=your_jwt_secret
 
 ### **3. Using Docker Containers
 #### **3.1 Docker Images Used
-Node.js: For running the application server.
-PostgreSQL: For managing the application database.
+- Node.js: For running the application server.
+- PostgreSQL: For managing the application database.
 3.2 Start Docker Containers
 A docker-compose.yml file is included in the repository. Use the following command to start the containers:
 
