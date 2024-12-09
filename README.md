@@ -33,7 +33,7 @@ The goal is to provide a scalable and clean API design that supports CRUD operat
 - Validation of incoming data.
 - Error handling for different failure scenarios.
 
-## MVC Architecture Overview
+## System-architecture
 
 This system follows a **Model-View-Controller (MVC)** architecture, which is a widely used design pattern to structure applications. It helps in separating concerns, improving code maintainability, and making it easier to scale the application. Below is an overview of how each component works in the context of this system:
 
@@ -159,11 +159,6 @@ The database consists of the following tables:
 2. **Roles**: Stores role definitions like Admin, Manager, and Employee.
 3. **Departments**: Stores department names and associated details.
 
-### Relationships:
-- An **Employee** belongs to a **Department** and has a specific **Role**.
-- A **Department** can have multiple employees.
-- A **Role** can be assigned to multiple employees.
-
 ### Example Schema (PostgreSQL):
 ```sql
 CREATE TABLE roles (
@@ -197,8 +192,74 @@ CREATE TABLE users (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-
 ```
+### Database Relationships
+
+The relationships between the tables in the database represent the core structure of the application. These relationships help define how different entities like **employees**, **roles**, **departments**, and **users** are connected, ensuring proper data integrity and allowing for meaningful data interactions.
+
+---
+
+### **1. Employees Table**
+The **employees** table stores detailed information about the employees, such as their name, email, department, and role. An employee is linked to both a **user** and a **department**, and each employee also has an associated **role**. 
+
+- **user_id**: Links to the **users** table, establishing a one-to-one relationship between an employee and a user record. The employee is connected to a user account, which contains sensitive information like the password and email.
+- **department_id**: Links to the **departments** table, creating a many-to-one relationship between employees and departments (i.e., multiple employees can belong to the same department).
+- **role_id**: Links to the **roles** table, establishing a many-to-one relationship between employees and roles (i.e., multiple employees can have the same role, such as "Manager" or "Employee").
+
+### **2. Roles Table**
+The **roles** table defines various roles that can be assigned to users or employees. Each role has a `name` (such as "Admin", "Manager", or "Employee") and a set of `permissions` stored in a JSONB column. Permissions allow fine-grained control over what a user can do within the system (e.g., managing employees, viewing certain resources, etc.).
+
+- **Permissions**: This is a JSONB column that stores permissions for each role. It can include various capabilities such as creating, reading, updating, or deleting records.
+- **Relationship with Employees**: A role is assigned to one or more employees. The **role_id** in the employees table points to a specific role, dictating what actions the employee can perform within the system.
+
+### **3. Departments Table**
+The **departments** table stores information about different departments in the organization, such as HR, IT, or Sales. 
+
+- **Relationship with Employees**: Each employee belongs to a specific department, and this relationship is maintained using the **department_id** in the employees table. One department can have multiple employees, establishing a one-to-many relationship between departments and employees.
+
+### **4. Users Table**
+The **users** table holds the authentication details for each user (such as their username, email, and password). The table also contains references to the **roles** and **departments** tables, meaning each user is associated with a specific role and optionally a department.
+
+- **user_id in employees**: The **employees** table contains a **user_id** column, linking an employee to a user account in the **users** table. This relationship is essential for managing login credentials and authenticating users.
+  
+- **Role and Department for Users**: The **users** table contains a **role_id** (for linking the user to a specific role) and a **department_id** (for linking the user to a department). A user’s role dictates their level of access within the system, while the department links them to the organizational unit they belong to.
+
+---
+
+### **Relationships Summary**
+
+1. **Employee ↔ User**: 
+   - Each **employee** has a corresponding **user** in the system.
+   - An employee can be linked to a user for authentication, and the user table stores sensitive data like email and password.
+   - This is a **one-to-one** relationship.
+
+2. **Employee ↔ Department**: 
+   - An **employee** is assigned to a **department**, and each department can have many employees.
+   - This is a **many-to-one** relationship where each employee belongs to a single department, but a department can have multiple employees.
+  
+3. **Employee ↔ Role**:
+   - Each **employee** is assigned a **role**, which defines what they are allowed to do in the system. Multiple employees can share the same role.
+   - This is a **many-to-one** relationship, where an employee has a single role, but a role can be assigned to multiple employees.
+  
+4. **User ↔ Role**:
+   - A **user** is assigned a **role** (such as Admin, Manager, or Employee) through the **role_id** field.
+   - This relationship defines what actions a user can perform within the system based on their role.
+   - A **user** can only have one role, and each role can be assigned to multiple users.
+   - This is a **many-to-one** relationship from users to roles.
+
+5. **User ↔ Department**: 
+   - A **user** can optionally belong to a **department**. This is used in the case where users are directly tied to a department (such as managers or department heads).
+   - This is a **many-to-one** relationship, where multiple users can belong to the same department.
+   
+6. **Role ↔ Permissions**:
+   - The **permissions** stored in the **roles** table define the capabilities of each role. Permissions are stored as a JSONB field, allowing for flexible, dynamic management.
+   - This relationship dictates how a role can access and interact with the application.
+
+---
+
+### Visual Representation of Relationships:
+
+
 
 
 ## Setup and Configuration
