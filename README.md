@@ -33,14 +33,123 @@ The goal is to provide a scalable and clean API design that supports CRUD operat
 - Validation of incoming data.
 - Error handling for different failure scenarios.
 
-## System Architecture
+## MVC Architecture Overview
 
-This system follows a **Model-View-Controller (MVC)** architecture:
+This system follows a **Model-View-Controller (MVC)** architecture, which is a widely used design pattern to structure applications. It helps in separating concerns, improving code maintainability, and making it easier to scale the application. Below is an overview of how each component works in the context of this system:
 
-1. **Model**: Represents the database schema (Employees, Roles, Departments).
-2. **View**: API responses in JSON format.
-3. **Controller**: Business logic to handle requests and interact with the models.
-4. **Middleware**: Authentication and authorization handling.
+---
+
+### **1. Model**
+
+The **Model** is responsible for representing the database schema and handling the data interaction. It defines the structure of the data that the application operates on, such as Employees, Roles, and Departments. Models encapsulate the logic needed to interact with the database and return data to the Controller.
+
+In this application, we have:
+- **Employees**: Stores employee details (e.g., name, email, department).
+- **Roles**: Defines roles such as Admin, Manager, and Employee.
+- **Departments**: Stores department-related information, linking employees to their respective departments.
+
+The models are used by the **Controller** and **Service** layers to fetch, create, update, or delete data from the database.
+
+---
+
+### **2. View**
+
+The **View** is responsible for presenting data to the user, usually in the form of HTML or JSON. In this system, the View consists of API responses formatted as JSON, which are returned to the client (e.g., frontend or API consumers). 
+
+For instance:
+- When a request is made to view an employee, the View will send back a JSON response with the employee’s data.
+- When an employee is updated, the View will return a JSON response confirming the update.
+
+In summary, the View is what the user interacts with, which in this case is the API's JSON output.
+
+---
+
+### **3. Controller**
+
+The **Controller** contains the business logic and acts as a middle layer between the **Model** and the **View**. It is responsible for receiving requests from the user (via routes), processing them, interacting with the **Model** and **Service** to retrieve or manipulate data, and then sending the appropriate **View** (response).
+
+Here’s an example of how the Controller interacts with the Model and Service:
+- A request comes in to view an employee's details.
+- The Controller checks the request, verifies if the employee exists by querying the **Employee Model** and uses the **Service** to manage business rules (such as permission checks).
+- The Controller then sends back the corresponding data in JSON format (via the **View**).
+
+In this system, controllers handle different functionalities, including:
+- Fetching and displaying employee data.
+- Handling employee creation, updates, and deletion.
+- Filtering employees by roles or departments.
+- Ensuring business rules are adhered to (such as managers only viewing employees in their department).
+
+---
+
+### **4. Service**
+
+The **Service** layer contains the core business logic of the application. It is separate from the **Controller** to allow for a more modular and testable structure. The **Service** interacts with the **Model** to perform CRUD operations (Create, Read, Update, Delete) and enforces the business rules of the application. 
+
+- **Employee Service**: Manages the logic related to employee data, such as fetching employee details, updating employee records, or filtering employees based on roles or departments.
+- **Role Service**: Handles role-specific logic, such as permission management and role-based access control (RBAC).
+- **Department Service**: Contains logic to manage department-specific operations.
+
+The **Controller** delegates business logic to the **Service** layer, ensuring that the controller remains focused on request handling and response formatting.
+
+For example:
+- The **Controller** may call a **Service** to fetch employees within a manager’s department or apply certain business rules (like filtering based on role and department).
+
+---
+
+### **5. Middleware**
+
+**Middleware** serves as an intermediary between the request and the Controller. It is responsible for tasks such as authentication, authorization, and validation before the request reaches the controller.
+
+- **Authentication Middleware**: Verifies if the request has a valid JWT token or session to authenticate the user.
+- **Authorization Middleware**: Ensures that users have the necessary permissions to perform actions like updating or deleting employees (e.g., Admins can manage all employees, Managers can only manage employees in their department).
+- **Validation Middleware**: Validates incoming request data to ensure it conforms to expected formats (e.g., checking that required fields are provided).
+
+---
+
+### **6. Routes**
+
+The **Routes** are responsible for handling incoming requests and delegating them to the appropriate **Controller**. They define the available API endpoints and connect those endpoints to the **Controller** functions.
+
+Additionally, routes are responsible for integrating **Middleware** to ensure that requests are properly authenticated and authorized before they reach the business logic layer.
+
+- **Auth Routes**: Handles login, signup, and token validation.
+- **Employee Routes**: Handles routes for managing employees, such as viewing, creating, updating, and deleting employee data.
+- **Role Routes**: Manages role-related operations and permissions.
+- **Department Routes**: Manages department-related operations.
+
+The routes are typically structured to include **middleware for permissions** and **authentication checks**. For example, before a user can create, update, or delete an employee, the **permission middleware** checks if the user has the appropriate role (Admin or Manager) to perform that action.
+
+---
+
+### **Example Flow of Request Handling**
+
+1. **Route**: When a user requests to get all employees (`GET /employees`), the route handler calls the corresponding controller method (`getAllEmployeesController`).
+   
+2. **Middleware**: Before reaching the controller, the request passes through middleware:
+   - The **authentication middleware** checks if the user is authenticated.
+   - The **authorization middleware** checks if the user has the correct permissions (e.g., Admin, Manager, or Employee).
+   
+3. **Controller**: If the request passes the middleware, the **controller** is responsible for executing the business logic:
+   - The controller may query the **Model** to fetch employee data based on certain criteria (like the user’s role or department).
+   - It processes the response and returns it in JSON format to the **View**.
+
+4. **Service**: The **Service** layer is called by the Controller to enforce business rules (e.g., a Manager can only see employees within their department).
+
+5. **View**: Finally, the **View** sends the response (a JSON object) to the client.
+
+---
+
+### **Summary of MVC Responsibilities**
+
+- **Model**: Represents the application's data and database schema.
+- **View**: Formats the data into JSON responses to be sent to the client.
+- **Controller**: Contains the business logic, handling requests, interacting with the Model and Service, and sending the response via the View.
+- **Service**: Handles core business logic and enforces application rules.
+- **Middleware**: Manages tasks like authentication, authorization, and validation before requests reach the Controller.
+- **Routes**: Define available API endpoints and connect those endpoints to the Controller, including middleware for permissions and authentication.
+
+By following this MVC architecture, the system ensures clear separation of concerns, making it easier to manage, scale, and extend in the future.
+
 
 ## Database Structure
 
