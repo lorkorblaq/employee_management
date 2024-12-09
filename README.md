@@ -13,9 +13,7 @@ This is a backend API for an Employee Management System that implements Role-Bas
 - [API Endpoints](#api-endpoints)
 - [Role Permissions](#role-permissions)
 - [Error Handling and Validation](#error-handling-and-validation)
-- [Docker Deployment](#docker-deployment)
 - [Tech Stack](#tech-stack)
-- [Contributing](#contributing)
 
 ## Overview
 
@@ -77,3 +75,521 @@ CREATE TABLE employees (
     department_id INT REFERENCES departments(id),
     role_id INT REFERENCES roles(id)
 );
+
+```
+
+
+## Setup and Configuration
+
+Follow these steps to set up and configure the application in both local and production environments. The setup includes instructions for running the application using Docker containers.
+
+---
+
+### **Prerequisites**
+1. Install [Docker](https://www.docker.com/) and [Docker Compose](https://docs.docker.com/compose/) on your machine.
+2. Ensure you have `npm` (Node.js package manager) installed for optional local setup.
+3. (Optional) Use tools like [Postman](https://www.postman.com/) for testing APIs.
+4. Docker image used are, node:slim22 and postgres:bullseye
+
+---
+
+### **1. Clone the Repository**
+Clone the project from the repository to your local machine:
+```bash
+git clone <repository-url>
+cd <project-folder>
+```
+### **2. Environment Configuration
+Set up the environment variables by creating a .env file in the root of your project. Below is an example of the variables to include:
+# Application
+PORT=3000
+NODE_ENV=development
+
+# Database
+DB_HOST=db
+DB_PORT=5432
+DB_USER=postgres
+DB_PASSWORD=yourpassword
+DB_NAME=yourdatabase
+
+# JWT
+JWT_SECRET=your_jwt_secret
+
+### **3. Using Docker Containers
+#### **3.1 Docker Images Used
+Node.js: For running the application server.
+PostgreSQL: For managing the application database.
+3.2 Start Docker Containers
+A docker-compose.yml file is included in the repository. Use the following command to start the containers:
+
+```bash
+docker-compose up --build
+```
+This will:
+
+1. Build and run the Node.js application in one container.
+2. Set up the PostgreSQL database in another container.
+
+The services defined in docker-compose.yml include:
+1. app: Runs the Node.js server.
+2. db: Hosts the PostgreSQL database.
+
+
+
+## API Endpoints
+
+The following endpoints are available in the application, organized by functionality:
+
+### **Employee Management**
+
+- **Get All Employees**
+  - **URL:** `/api/employees`
+  - **Method:** `GET`
+  - **Description:** Retrieve a list of employees.  
+    - **Admins:** Can view all employees.  
+    - **Managers:** Can view employees in their department.  
+    - **Employees:** Can only view their own information.
+  - **Authorization Required:** Yes (JWT Token)
+  - **Response Example (Admin):**
+    ```json
+    [
+      {
+        "id": 1,
+        "name": "John Doe",
+        "role_id": 2,
+        "role_name": "Manager",
+        "department_id": 3,
+        "department_name": "Human Resources"
+      },
+      {
+        "id": 2,
+        "name": "Jane Smith",
+        "role_id": 3,
+        "role_name": "Employee",
+        "department_id": 3,
+        "department_name": "Human Resources"
+      }
+    ]
+    ```
+
+- **Get Employee by ID**
+  - **URL:** `/api/employees/:id`
+  - **Method:** `GET`
+  - **Description:** Retrieve details of a specific employee.  
+    - **Admins:** Can view any employee.  
+    - **Managers:** Can view employees in their department.  
+    - **Employees:** Can only view their own information.
+  - **Authorization Required:** Yes (JWT Token)
+  - **Response Example:**
+    ```json
+    {
+      "id": 1,
+      "name": "John Doe",
+      "role_id": 2,
+      "role_name": "Manager",
+      "department_id": 3,
+      "department_name": "Human Resources"
+    }
+    ```
+
+- **Create Employee**
+  - **URL:** `/api/employees`
+  - **Method:** `POST`
+  - **Description:** Add a new employee to the system.
+  - **Authorization Required:** Yes (Admin or Manager with `manage_employees` permission)
+  - **Request Body Example:**
+    ```json
+    {
+      "name": "John Doe",
+      "role_id": 3,
+      "department_id": 2,
+      "email": "johndoe@example.com"
+    }
+    ```
+  - **Response Example:**
+    ```json
+    {
+      "message": "Employee created successfully",
+      "employee": {
+        "id": 4,
+        "name": "John Doe",
+        "role_id": 3,
+        "department_id": 2,
+        "email": "johndoe@example.com"
+      }
+    }
+    ```
+
+- **Update Employee**
+  - **URL:** `/api/employees/:id`
+  - **Method:** `PUT`
+  - **Description:** Update employee details.
+  - **Authorization Required:** Yes (Admin or Manager with `manage_employees` permission)
+  - **Request Body Example:**
+    ```json
+    {
+      "name": "Jane Doe",
+      "department_id": 4
+    }
+    ```
+  - **Response Example:**
+    ```json
+    {
+      "message": "Employee updated successfully",
+      "employee": {
+        "id": 1,
+        "name": "Jane Doe",
+        "role_id": 3,
+        "department_id": 4
+      }
+    }
+    ```
+
+- **Delete Employee**
+  - **URL:** `/api/employees/:id`
+  - **Method:** `DELETE`
+  - **Description:** Remove an employee from the system.
+  - **Authorization Required:** Yes (Admin or Manager with `manage_employees` permission)
+  - **Response Example:**
+    ```json
+    {
+      "message": "Employee deleted successfully"
+    }
+    ```
+## Role Permissions
+
+The following endpoints are available for managing roles and permissions in the system:
+
+### **Role Management**
+
+- **Get All Roles**
+  - **URL:** `/api/roles`
+  - **Method:** `GET`
+  - **Description:** Retrieve a list of all roles in the system.
+  - **Authorization Required:** Yes (Admins only)
+  - **Response Example:**
+    ```json
+    [
+      {
+        "id": 1,
+        "name": "Admin",
+        "permissions": ["manage_employees", "manage_roles", "manage_departments"]
+      },
+      {
+        "id": 2,
+        "name": "Manager",
+        "permissions": ["manage_employees"]
+      },
+      {
+        "id": 3,
+        "name": "Employee",
+        "permissions": []
+      }
+    ]
+    ```
+
+- **Create Role**
+  - **URL:** `/api/roles`
+  - **Method:** `POST`
+  - **Description:** Add a new role to the system.
+  - **Authorization Required:** Yes (Admins only)
+  - **Request Body Example:**
+    ```json
+    {
+      "name": "Supervisor",
+      "permissions": ["manage_employees"]
+    }
+    ```
+  - **Response Example:**
+    ```json
+    {
+      "message": "Role created successfully",
+      "role": {
+        "id": 4,
+        "name": "Supervisor",
+        "permissions": ["manage_employees"]
+      }
+    }
+    ```
+
+- **Update Role**
+  - **URL:** `/api/roles/:id`
+  - **Method:** `PUT`
+  - **Description:** Update the details of a specific role.
+  - **Authorization Required:** Yes (Admins only)
+  - **Request Body Example:**
+    ```json
+    {
+      "name": "Team Lead",
+      "permissions": ["manage_employees", "view_reports"]
+    }
+    ```
+  - **Response Example:**
+    ```json
+    {
+      "message": "Role updated successfully",
+      "role": {
+        "id": 4,
+        "name": "Team Lead",
+        "permissions": ["manage_employees", "view_reports"]
+      }
+    }
+    ```
+
+- **Delete Role**
+  - **URL:** `/api/roles/:id`
+  - **Method:** `DELETE`
+  - **Description:** Remove a role from the system.
+  - **Authorization Required:** Yes (Admins only)
+  - **Response Example:**
+    ```json
+    {
+      "message": "Role deleted successfully"
+    }
+    ```
+
+### **Permission Management**
+
+- **Get Role Permissions**
+  - **URL:** `/api/roles/:id/permissions`
+  - **Method:** `GET`
+  - **Description:** Retrieve the permissions assigned to a specific role.
+  - **Authorization Required:** Yes (Admins only)
+  - **Response Example:**
+    ```json
+    {
+      "role_id": 2,
+      "role_name": "Manager",
+      "permissions": ["manage_employees"]
+    }
+    ```
+
+- **Update Role Permissions**
+  - **URL:** `/api/roles/:id/permissions`
+  - **Method:** `PUT`
+  - **Description:** Update the permissions assigned to a specific role.
+  - **Authorization Required:** Yes (Admins only)
+  - **Request Body Example:**
+    ```json
+    {
+      "permissions": ["manage_employees", "view_reports"]
+    }
+    ```
+  - **Response Example:**
+    ```json
+    {
+      "message": "Permissions updated successfully",
+      "role": {
+        "id": 2,
+        "name": "Manager",
+        "permissions": ["manage_employees", "view_reports"]
+      }
+    }
+    ```
+## Department Management
+
+The following endpoints are available for managing departments in the system:
+
+### **Department Management**
+
+- **Get All Departments**
+  - **URL:** `/api/departments`
+  - **Method:** `GET`
+  - **Description:** Retrieve a list of all departments in the organization.
+  - **Authorization Required:** Yes (Admins only)
+  - **Response Example:**
+    ```json
+    [
+      {
+        "id": 1,
+        "name": "Human Resources"
+      },
+      {
+        "id": 2,
+        "name": "Engineering"
+      },
+      {
+        "id": 3,
+        "name": "Sales"
+      }
+    ]
+    ```
+
+- **Create Department**
+  - **URL:** `/api/departments`
+  - **Method:** `POST`
+  - **Description:** Add a new department to the organization.
+  - **Authorization Required:** Yes (Admins only)
+  - **Request Body Example:**
+    ```json
+    {
+      "name": "Marketing"
+    }
+    ```
+  - **Response Example:**
+    ```json
+    {
+      "message": "Department created successfully",
+      "department": {
+        "id": 4,
+        "name": "Marketing"
+      }
+    }
+    ```
+
+- **Update Department**
+  - **URL:** `/api/departments/:id`
+  - **Method:** `PUT`
+  - **Description:** Update the details of an existing department.
+  - **Authorization Required:** Yes (Admins only)
+  - **Request Body Example:**
+    ```json
+    {
+      "name": "Product Development"
+    }
+    ```
+  - **Response Example:**
+    ```json
+    {
+      "message": "Department updated successfully",
+      "department": {
+        "id": 2,
+        "name": "Product Development"
+      }
+    }
+    ```
+
+- **Delete Department**
+  - **URL:** `/api/departments/:id`
+  - **Method:** `DELETE`
+  - **Description:** Remove a department from the organization.
+  - **Authorization Required:** Yes (Admins only)
+  - **Response Example:**
+    ```json
+    {
+      "message": "Department deleted successfully"
+    }
+    ```
+
+### **Get Department by ID**
+- **URL:** `/api/departments/:id`
+  - **Method:** `GET`
+  - **Description:** Retrieve information about a specific department.
+  - **Authorization Required:** Yes (Admins and Managers)
+  - **Response Example:**
+    ```json
+    {
+      "id": 2,
+      "name": "Engineering"
+    }
+    ```
+
+
+## Error Handling and Validation
+
+Effective error handling and validation are critical for building reliable and secure applications. In this project, both error handling and validation mechanisms are implemented to ensure that the application can handle issues gracefully and provide meaningful feedback to the users. Below is a detailed explanation of the error handling and validation strategies used in this application.
+
+---
+
+### **Error Handling**
+
+1. **Try-Catch Blocks**:  
+   - **Description**: A `try-catch` block is used extensively in the application to catch errors that occur during asynchronous operations such as database queries or API requests.
+   - **Why it's used**: This structure helps capture unexpected errors and prevents the application from crashing. When an error is caught, a custom error message is returned to the user, ensuring a controlled failure.
+
+2. **Error Middleware**:  
+   - **Description**: The application uses custom error-handling middleware in Express.js to manage and format error responses.
+   - **Why it's used**: By centralizing error handling in middleware, we ensure that all errors are formatted consistently and that sensitive error details (like stack traces) are not exposed to the user. This middleware also logs errors for further debugging.
+   
+   Example:
+   ```javascript
+   app.use((err, req, res, next) => {
+       console.error(err.stack);
+       res.status(500).json({
+           message: "Something went wrong! Please try again later."
+       });
+   });
+
+
+
+
+## Tech Stack
+
+The application is built using a modern tech stack to ensure scalability, performance, and ease of development. Below is a comprehensive breakdown of the technologies used in the project.
+
+---
+
+### **Backend**
+
+1. **Node.js**:  
+   - **Description**: Node.js is a JavaScript runtime built on Chrome's V8 engine, enabling us to build scalable and efficient server-side applications.
+   - **Why it's used**: Node.js is well-suited for building I/O-heavy applications like REST APIs due to its non-blocking, event-driven architecture.
+
+2. **Express.js**:  
+   - **Description**: Express is a minimal web application framework for Node.js, simplifying API development and routing.
+   - **Why it's used**: It helps in quickly building RESTful APIs with robust features like middleware support, routing, and more.
+
+---
+
+### **Database**
+
+1. **PostgreSQL**:  
+   - **Description**: PostgreSQL is a powerful, open-source relational database management system (RDBMS) known for its reliability, flexibility, and extensibility.
+   - **Why it's used**: PostgreSQL is ideal for handling complex queries and relationships, which makes it suitable for managing employee data, roles, and permissions in this application.
+
+2. **Sequelize ORM** (Optional):
+   - **Description**: Sequelize is a promise-based ORM for Node.js that supports multiple database engines, including PostgreSQL.
+   - **Why it's used**: It simplifies database interaction by providing an abstraction layer that allows developers to write queries using JavaScript instead of raw SQL.
+
+---
+
+### **Authentication and Authorization**
+
+1. **JWT (JSON Web Tokens)**:  
+   - **Description**: JWT is an open standard for securely transmitting information between parties as a JSON object. It is widely used for authentication in web applications.
+   - **Why it's used**: JWT allows secure stateless authentication and is used to authorize API requests by embedding user roles and permissions into the token.
+
+---
+
+### **Containerization and Deployment**
+
+1. **Docker**:  
+   - **Description**: Docker is a platform for developing, shipping, and running applications in containers.
+   - **Why it's used**: Docker ensures the application runs consistently across different environments (local, development, production). It allows us to package the app along with its dependencies and configuration into containers.
+
+2. **Docker Compose**:  
+   - **Description**: Docker Compose is a tool for defining and running multi-container Docker applications. It allows us to define services (such as the web app and database) in a single file (`docker-compose.yml`) and manage them together.
+   - **Why it's used**: Docker Compose simplifies the management of multi-container applications, enabling easy orchestration and configuration.
+
+---
+
+### **API Testing**
+
+1. **Postman**:  
+   - **Description**: Postman is a tool used for testing APIs by sending HTTP requests to endpoints and receiving responses.
+   - **Why it's used**: It is a popular tool for quickly testing and documenting APIs without needing to write complex code.
+
+---
+
+### **Development Tools**
+
+1. **VS Code**:  
+   - **Description**: Visual Studio Code is a lightweight but powerful source code editor.
+   - **Why it's used**: With features like IntelliSense, debugging, and extensions, VS Code is an ideal code editor for JavaScript and Node.js development.
+
+2. **Git**:  
+   - **Description**: Git is a distributed version control system to track changes in source code.
+   - **Why it's used**: Git enables collaboration between multiple developers, easy versioning, and seamless code management.
+
+---
+
+---
+
+### **Tech Stack Summary**
+- **Backend**: Node.js, Express.js
+- **Database**: PostgreSQL
+- **Authentication**: JWT
+- **Containerization**: Docker, Docker Compose
+- **API Testing**: Postman
+- **Development Tools**: VS Code, Git
+
