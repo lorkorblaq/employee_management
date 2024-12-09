@@ -243,7 +243,7 @@ The ADMIN_EMAIL is automatically created as an admin and the ADMIN_PASSWORD is t
 - JWT_SECRET=your_jwt_secret
 
 ### **3. Using Docker Containers
-#### **3.1 Docker Images Used
+Docker Images Used
 - Node.js: For running the application server.
 - PostgreSQL: For managing the application database.
 3.2 Start Docker Containers
