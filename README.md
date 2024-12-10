@@ -543,44 +543,7 @@ The following endpoints are available for managing roles and permissions in the 
     }
     ```
 
-### **Permission Management**
 
-- **Get Role Permissions**
-  - **URL:** `/api/roles/:id/permissions`
-  - **Method:** `GET`
-  - **Description:** Retrieve the permissions assigned to a specific role.
-  - **Authorization Required:** Yes (Admins only)
-  - **Response Example:**
-    ```json
-    {
-      "role_id": 2,
-      "role_name": "Manager",
-      "permissions": ["manage_employees"]
-    }
-    ```
-
-- **Update Role Permissions**
-  - **URL:** `/api/roles/:id/permissions`
-  - **Method:** `PUT`
-  - **Description:** Update the permissions assigned to a specific role.
-  - **Authorization Required:** Yes (Admins only)
-  - **Request Body Example:**
-    ```json
-    {
-      "permissions": ["manage_employees", "view_reports"]
-    }
-    ```
-  - **Response Example:**
-    ```json
-    {
-      "message": "Permissions updated successfully",
-      "role": {
-        "id": 2,
-        "name": "Manager",
-        "permissions": ["manage_employees", "view_reports"]
-      }
-    }
-    ```
 ## Department Management
 
 The following endpoints are available for managing departments in the system:
@@ -624,7 +587,6 @@ The following endpoints are available for managing departments in the system:
   - **Response Example:**
     ```json
     {
-      "message": "Department created successfully",
       "department": {
         "id": 4,
         "name": "Marketing"
@@ -646,7 +608,6 @@ The following endpoints are available for managing departments in the system:
   - **Response Example:**
     ```json
     {
-      "message": "Department updated successfully",
       "department": {
         "id": 2,
         "name": "Product Development"
